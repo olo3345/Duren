@@ -12,7 +12,7 @@ class Player():
         return self.cards
 
 
-with open(r"\Client\config.json", "r") as f:
+with open(r"/Client/config.json", "r") as f:
     data = dict(json.load(f))
     SERVER = data.get("default_server_ip")
     PORT = data.get("default_server_port")

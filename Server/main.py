@@ -1,6 +1,6 @@
 import socket, threading, datetime, json, random
 
-with open(r"Server\config.json", "r") as json_config_file:
+with open(r"/Server/config.json", "r") as json_config_file:
     data = dict(json.load(json_config_file))
     HOST = data.get("host")
     PORT = data.get("port")
