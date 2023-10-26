@@ -1,32 +1,33 @@
 import socket, datetime, json
 
-class Player():
-    def __init__(self):
-        self.cards = list()
-    def set_cards(self, cards : list = None):
-        if cards != None:
-            self.cards.clear()
-            self.cards.extend(cards)
-    @property
-    def getCards(self):
-        return self.cards
+from kivy.app import App
+from kivy.uix.widget import Widget
+from kivy.properties import ObjectProperty
+from kivy.lang import Builder
 
-
-with open(r"/Client/config.json", "r") as f:
-    data = dict(json.load(f))
-    SERVER = data.get("default_server_ip")
-    PORT = data.get("default_server_port")
-    ADDR = (SERVER, PORT)
-    HEADER = data.get("header")
-    FORMAT = data.get("format")
-    DISCONNECT_MESSAGE = data.get("disconnect_message")
-    UPDATE_MESSAGE = data.get("update_string")
-    DATE_TIME_FORMAT = data.get("date_time_format")
+DEBUG = True
+def do_print(print_args : tuple): # debugOnly_print
+    if DEBUG == True:
+        print(print_args)  
+ 
+SERVER = "192.168.1.208"
+PORT = 5000
+ADDR = (SERVER, PORT)
+HEADER = 4096
+FORMAT = "utf-8"
+DISCONNECT_MESSAGE = "$DISCONNECT"
+UPDATE_MESSAGE = "$UPDATE"
+DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 formated_current_date_time = datetime.datetime.now().strftime(DATE_TIME_FORMAT)
-
-player = Player
+player_cards = []
 client  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
+
+def set_cards(cards : list = None):
+    global player_cards
+    if cards != None:
+        player_cards.clear()
+        player_cards.extend(cards)
 def send(msg : str):
     message = msg.encode(FORMAT)
     msg_lenght = len(message)
@@ -35,31 +36,38 @@ def send(msg : str):
     client.send(send_lenght)
     client.send(message)
 def uptade_ping():
-    global player
+    global player_cards
     send(UPDATE_MESSAGE)
     msg_lenght = client.recv(HEADER).decode(FORMAT)
     if msg_lenght:
         msg_lenght = int(msg_lenght)
         msg = client.recv(msg_lenght).decode(FORMAT)
         data = dict(json.load(msg))
-        player.set_cards(data["cards"])        
-def connect(addres: tuple = ADDR):
+        set_cards(data["cards"])        
+def connect(addres : tuple = ADDR, userName : dict = {"userName" : "p1"}):
     if addres == ADDR:
-        print(f'[{formated_current_date_time}][Client][INFO] Connecting to the default server')
+        do_print(f'[{formated_current_date_time}][Client][INFO] Connecting to the default server')
     else:
-        print(f'[{formated_current_date_time}][Client][INFO] Connecting to {addres}')
+        do_print(f'[{formated_current_date_time}][Client][INFO] Connecting to {addres}')
     client.connect(ADDR)
     msg_lenght = client.recv(HEADER).decode(FORMAT)
     if msg_lenght:
         msg_lenght = int(msg_lenght)
         msg = client.recv(msg_lenght).decode(FORMAT)
         if msg == f'${DISCONNECT_MESSAGE}':
-            print(f'[{formated_current_date_time}][Client][Info] Got disconected by the server') 
+            do_print(f'[{formated_current_date_time}][Client][Info] Got disconected by the server') 
             return
         else:
-            print(f'[{formated_current_date_time}][Client][Info] Connected succesfully')                             
+            do_print(f'[{formated_current_date_time}][Client][Info] Connected succesfully')
+            send(json.dumps(userName))                           
 def disconnect():
     send(DISCONNECT_MESSAGE)
 
-connect(ADDR)
-send(input("send :"))
+kv = Builder.load_file("my.kv")
+
+class MyApp(App):
+    def build(self):
+        return kv
+
+if __name__ == "__main__":
+    MyApp().run()

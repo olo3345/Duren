@@ -1,6 +1,6 @@
 import socket, threading, datetime, json, random
 
-with open(r"/Server/config.json", "r") as json_config_file:
+with open(r"Server/config.json", "r") as json_config_file:
     data = dict(json.load(json_config_file))
     HOST = data.get("host")
     PORT = data.get("port")
@@ -17,6 +17,7 @@ with open(r"/Server/config.json", "r") as json_config_file:
 active_connections_list = []    
 players_cards = {}
 used_cards = []
+addresToUserName = {}
 turn = int()
 formated_current_date_time = datetime.datetime.now().strftime(DATE_TIME_FORMAT)
 server  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,14 +51,21 @@ def deal_cards():
             deal_card(active_connections_list[i])
 def client_handlerer(conn, addr):
     global active_connections_list
+    global players_cards
+    global addresToUserName
     if len(active_connections_list) > 6:
         send(f'%{DISCONNECT_MESSAGE}', conn)
         active_connections_list.remove(addr)
         print(f'[{formated_current_date_time}][SERVER][INFO] Client {addr} connection rejected, connection limit')
+        conn.close()
         return
     else:
         send("hello", conn)
         print(f'[{formated_current_date_time}][SERVER][INFO] Client {addr} succesfully connected, now at {len(active_connections_list)} connections')
+        msg_lenght = int(conn.recv(HEADER).decode(FORMAT))
+        msg = conn.recv(msg_lenght).decode(FORMAT)
+        addresToUserName.update(json.load(msg))
+        
     connected = True
     while connected:
         msg_lenght = conn.recv(HEADER).decode(FORMAT)
@@ -69,19 +77,24 @@ def client_handlerer(conn, addr):
                 active_connections_list.remove(addr)
                 break
             else:
-                print(f'[{formated_current_date_time}][{addr}][MSG] {msg}')       
+                print(f'[{formated_current_date_time}][{addr}][MSG] {msg}')
+            if msg == UPDATE_MESSAGE:
+                send(players_cards[addr], conn)
+                print(f'[{formated_current_date_time}][INFO] Gave cards to {addr}')
     conn.close()   
 def start():
+    global active_connections_list
     print(f'[{formated_current_date_time}][SERVER][INFO] Starting...')
     print(f'[{formated_current_date_time}][SERVER][INFO] Using time stamp format {DATE_TIME_FORMAT}')
-    global active_connections_list
     server.listen()
     print(f'[{formated_current_date_time}][SERVER][INFO][LISTENER] Listening on {HOST}:{PORT}')
     while True:
         conn, addr = server.accept()
         thread = threading.Thread(target = client_handlerer, args = (conn, addr)) 
         active_connections_list.append(addr)
-        thread.start()
-        
+        thread.start()  
 def start_game():
-    pass
+    deal_cards()
+    print(f'[{formated_current_date_time}][SERVER][INFO] Dealt cards')
+    
+start()
