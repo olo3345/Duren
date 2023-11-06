@@ -1,1 +1,0 @@
-python c:\Users\Ja\Desktop\moje_pliki\Programowanie\Duren\Duren\Server\main.py

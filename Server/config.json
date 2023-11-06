@@ -6,6 +6,7 @@
     "port" : 5000,
     "format" : "utf-8",
     "disconnect_message" : "$DISCONNECT",
+    "user_name_exists_msg" : "$USERNAMEEXISTS",
     "card_amaunt_per_player" : 6,
     "cards" : {
         "types" : ["clubs", "diamonds", "hearts", "spades"],

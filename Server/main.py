@@ -13,6 +13,7 @@ with open(r"Server/config.json", "r") as json_config_file:
     DATE_TIME_FORMAT = data.get("date_time_format")
     DISCONNECT_MESSAGE = data.get("disconnect_message")
     UPDATE_MESSAGE = data.get("update_string")
+    USER_NAME_EXISTS_MSG = data.get("user_name_exists_msg")
     #HOST = socket.gethostbyname(socket.gethostname())
 active_connections_list = []    
 players_cards = {}
@@ -48,7 +49,7 @@ def deal_card(addres):
 def deal_cards():
     for i in range(len(active_connections_list)):
         for i2 in range(6):
-            deal_card(active_connections_list[i])
+            deal_card(active_connections_list[i])      
 def client_handlerer(conn, addr):
     global active_connections_list
     global players_cards
@@ -56,16 +57,32 @@ def client_handlerer(conn, addr):
     if len(active_connections_list) > 6:
         send(f'%{DISCONNECT_MESSAGE}', conn)
         active_connections_list.remove(addr)
-        print(f'[{formated_current_date_time}][SERVER][INFO] Client {addr} connection rejected, connection limit')
+        print(f'[{formated_current_date_time}][SERVER][INFO] {addr} connection rejected, connection limit')
         conn.close()
         return
     else:
         send("hello", conn)
-        print(f'[{formated_current_date_time}][SERVER][INFO] Client {addr} succesfully connected, now at {len(active_connections_list)} connections')
         msg_lenght = int(conn.recv(HEADER).decode(FORMAT))
-        msg = conn.recv(msg_lenght).decode(FORMAT)
-        addresToUserName.update(json.load(msg))
-        
+        msg = json.loads(conn.recv(msg_lenght).decode(FORMAT))
+        __userName = msg["userName"]
+        if __userName not in addresToUserName.values():
+            addresToUserName.update({addr : __userName})
+            send("Accepted", conn)
+            print(f'[{formated_current_date_time}][SERVER][INFO] {addr} succesfully connected, now at {len(active_connections_list)} connections')
+            print(f'[{formated_current_date_time}][SERVER][INFO] {addr} is using {__userName} as thier username')
+        else:
+            while True:
+                send(USER_NAME_EXISTS_MSG, conn)
+                msg_lenght = int(conn.recv(HEADER).decode(FORMAT))
+                msg = json.loads(conn.recv(msg_lenght).decode(FORMAT))
+                __userName = msg["userName"]
+                if __userName not in addresToUserName.values():
+                    addresToUserName.update({addr : __userName})
+                    send("Accepted", conn)
+                    print(f'[{formated_current_date_time}][SERVER][INFO] {addr} succesfully connected, now at {len(active_connections_list)} connections')
+                    print(f'[{formated_current_date_time}][SERVER][INFO] {addr} is using {__userName} as thier username')
+                    break
+                               
     connected = True
     while connected:
         msg_lenght = conn.recv(HEADER).decode(FORMAT)

@@ -1,0 +1,49 @@
+<P0>:
+    Label:
+        text: "The server addres is not correct or the server is offline."
+    Label:
+        text: "Tap anywhere to close"
+
+WindowManager:
+    StartWindow:
+    MainWindow:
+
+<StartWindow>:
+    name: "start"
+    GridLayout:
+        cols: 1
+        size: root.width, root.height
+        GridLayout:
+            cols: 2
+            Label:
+                text: "Username:"
+            TextInput:
+                id: username
+                multiline: False
+            Label:
+                text: "Game ip:"
+            TextInput:
+                id: ip
+                multiline: False
+            Label:
+                text: "Game port:"
+            TextInput:
+                id: port
+                multiline: False
+        Button:
+            text: "Next"
+            on_release:
+                app.root.current = "main" if root.next(ip.text, port.text, username.text)  else app.root.current
+                root.manager.transition.direction = "left"
+
+
+<MainWindow>:
+    name: "main"
+    GridLayout:
+        cols: 1
+        size: root.width, root.height
+        Button:
+            text: "Go back"
+            on_release:
+                app.root.current = "start"
+                root.manager.transition.direction = "right"
