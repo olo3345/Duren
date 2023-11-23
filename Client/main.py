@@ -96,6 +96,11 @@ class StartWindow(Screen):
         return CONNECTED
         
 class MainWindow(Screen):
+    def disconnect(_):
+        if CONNECTED:
+            disconnect()
+            
+class HostYourOwn(Screen):
     pass
 class WindowManager(ScreenManager):
     pass

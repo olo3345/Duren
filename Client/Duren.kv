@@ -1,15 +1,18 @@
 <P0>:
-    Label:
-        text: "The server addres is not correct or the server is offline."
-    Label:
-        text: "Tap anywhere to close"
+    GridLayout:
+        cols: 1
+        Label:
+            text: "The server addres is not correct or the server is offline."
+        Label:
+            text: "Tap anywhere to close"
 
 WindowManager:
     StartWindow:
     MainWindow:
+    HostYourOwn:
 
 <StartWindow>:
-    name: "start"
+    name: "StartWindow"
     GridLayout:
         cols: 1
         size: root.width, root.height
@@ -33,17 +36,29 @@ WindowManager:
         Button:
             text: "Next"
             on_release:
-                app.root.current = "main" if root.next(ip.text, port.text, username.text)  else app.root.current
+                app.root.current = "MainWindow" if root.next(ip.text, port.text, username.text)  else app.root.current
                 root.manager.transition.direction = "left"
+        Button:
+            text: "Or host your own"
+            on_release:
+                app.root.current = "HostYourOwn"
+                root.manager.transition.direction = "up"
 
+<HostYourOwn>:
+    Button:
+        text: "Go back"
+        on_release:
+            app.root.current = "StartWindow"
+            root.manager.transition.direction = "down"
 
 <MainWindow>:
-    name: "main"
+    name: "MainWindow"
     GridLayout:
         cols: 1
         size: root.width, root.height
         Button:
             text: "Go back"
             on_release:
-                app.root.current = "start"
+                root.disconnect()
+                app.root.current = "StartWindow"
                 root.manager.transition.direction = "right"
