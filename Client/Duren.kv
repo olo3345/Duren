@@ -1,15 +1,7 @@
-<P0>:
-    GridLayout:
-        cols: 1
-        Label:
-            text: "The server addres is not correct or the server is offline."
-        Label:
-            text: "Tap anywhere to close"
-
 WindowManager:
     StartWindow:
-    MainWindow:
     HostYourOwn:
+    MainWindow:
 
 <StartWindow>:
     name: "StartWindow"
@@ -42,20 +34,26 @@ WindowManager:
             text: "Or host your own"
             on_release:
                 app.root.current = "HostYourOwn"
-                root.manager.transition.direction = "up"
+                root.manager.transition.direction = "right"
 
 <HostYourOwn>:
-    Button:
-        text: "Go back"
-        on_release:
-            app.root.current = "StartWindow"
-            root.manager.transition.direction = "down"
+    name: "HostYourOwn"
+    GridLayout:
+        cols: 1
+        Button:
+            text: "Go back"
+            on_release:
+                app.root.current = "StartWindow"
+                root.manager.transition.direction = "left"
 
 <MainWindow>:
     name: "MainWindow"
     GridLayout:
         cols: 1
         size: root.width, root.height
+        Button:
+            text: "g"
+            on_release: print("hi")
         Button:
             text: "Go back"
             on_release:

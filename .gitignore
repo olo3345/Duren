@@ -1,10 +1,11 @@
-
 .vscode
 
-startClient.bat
+.venv
 
-startServer.bat
+/client/__pycache__
 
-coms.md
+makeing_json.json
+
+networkig.md
 
 concept_UI.xcf

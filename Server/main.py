@@ -15,6 +15,7 @@ with open(r"Server/config.json", "r") as json_config_file:
     UPDATE_MESSAGE = data.get("update_string")
     USER_NAME_EXISTS_MSG = data.get("user_name_exists_msg")
     #HOST = socket.gethostbyname(socket.gethostname())
+cards_dealt: bool = False
 active_connections_list = []    
 players_cards = {}
 used_cards = []
@@ -54,6 +55,8 @@ def client_handlerer(conn, addr):
     global active_connections_list
     global players_cards
     global addresToUserName
+    global cards_dealt
+    
     if len(active_connections_list) > 6:
         send(f'%{DISCONNECT_MESSAGE}', conn)
         active_connections_list.remove(addr)
@@ -97,8 +100,9 @@ def client_handlerer(conn, addr):
                 print(f'[{formated_current_date_time}][{addr}][MSG] {msg}')
             if msg == UPDATE_MESSAGE:
                 send(players_cards[addr], conn)
-                print(f'[{formated_current_date_time}][INFO] Gave cards to {addr}')
-    conn.close()   
+                print(f'[{formated_current_date_time}][INFO] Gave cards to {addr}')            
+    conn.close()
+   
 def start():
     global active_connections_list
     print(f'[{formated_current_date_time}][SERVER][INFO] Starting...')
@@ -111,7 +115,9 @@ def start():
         active_connections_list.append(addr)
         thread.start()  
 def start_game():
+    global cards_dealt
     deal_cards()
+    cards_dealt = True
     print(f'[{formated_current_date_time}][SERVER][INFO] Dealt cards')
     
 start()
