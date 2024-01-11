@@ -1,6 +1,5 @@
-import socket, json
-from datetime import datetime
-from networking import *
+import socket, webbrowser
+from networking import send, disconnect, connect
 
 from kivy.app import App
 from kivy.uix.widget import Widget
@@ -17,7 +16,6 @@ def do_print(print_args : tuple): # debugOnly_print
     if DEBUG == True:
         print(print_args)  
  
-DATE_TIME_FORMAT = "%Y-%m-%d %H:%M:%S"
 CONNECTED: bool = False
 player_cards = []
 client  = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -50,7 +48,9 @@ class MainWindow(Screen):
             disconnect(client)
             
 class HostYourOwn(Screen):
-    pass
+    def displayWebsite(_):
+        webbrowser.open("https://github.com/olo3345/Duren")
+        # TODO: implement self hosting tutorial     
 class WindowManager(ScreenManager):
     pass
 

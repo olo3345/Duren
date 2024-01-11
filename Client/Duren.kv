@@ -41,6 +41,10 @@ WindowManager:
     GridLayout:
         cols: 1
         Button:
+            text: "Tutorial o hosting servers"
+            on_release:
+                root.displayWebsite()
+        Button:
             text: "Go back"
             on_release:
                 app.root.current = "StartWindow"
